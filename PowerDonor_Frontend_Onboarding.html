@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PowerDonor.AI — Frontend Engineer Onboarding</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9fafb; color: #111827; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 2rem 1rem; }
+  .deck { width: 100%; max-width: 900px; background: #fff; border-radius: 16px; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.07); }
+  .slide { display: none; padding: 2.5rem; min-height: 460px; flex-direction: column; justify-content: flex-start; }
+  .slide.active { display: flex; }
+  .nav-bar { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 2rem; border-bottom: 1px solid #e5e7eb; background: #fafafa; }
+  .nav-dots { display: flex; gap: 6px; flex-wrap: wrap; max-width: 200px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #d1d5db; cursor: pointer; transition: background 0.2s; }
+  .dot.active { background: #534AB7; }
+  .nav-btns { display: flex; gap: 8px; align-items: center; }
+  .nav-btns button { font-size: 13px; padding: 6px 16px; border-radius: 8px; border: 1px solid #d1d5db; background: #fff; color: #374151; cursor: pointer; font-family: inherit; }
+  .nav-btns button:hover { background: #f3f4f6; }
+  .slide-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #534AB7; margin-bottom: 0.5rem; }
+  .slide-title { font-size: 24px; font-weight: 600; color: #111827; margin-bottom: 0.4rem; line-height: 1.3; }
+  .slide-sub { font-size: 14px; color: #6b7280; margin-bottom: 1.5rem; line-height: 1.6; }
+  .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem 1.25rem; }
+  .card-sm { background: #f9fafb; border-radius: 8px; padding: 0.75rem 1rem; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 99px; }
+  .tag-purple { background: #EEEDFE; color: #3C3489; }
+  .tag-teal { background: #E1F5EE; color: #085041; }
+  .tag-amber { background: #FAEEDA; color: #633806; }
+  .tag-red { background: #FCEBEB; color: #791F1F; }
+  .tag-blue { background: #E6F1FB; color: #0C447C; }
+  .tag-gray { background: #f3f4f6; color: #374151; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .method-post { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: #E1F5EE; color: #085041; margin-right: 6px; font-family: monospace; }
+  .method-get { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: #E6F1FB; color: #0C447C; margin-right: 6px; font-family: monospace; }
+  .endpoint { font-family: monospace; font-size: 12px; color: #111827; }
+  .endpoint-desc { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .ep-row { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; border-bottom: 1px solid #f3f4f6; }
+  .ep-row:last-child { border-bottom: none; }
+  .stat-num { font-size: 30px; font-weight: 700; color: #534AB7; }
+  .stat-lbl { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .arrow { color: #9ca3af; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+  .flow-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.6rem 0.9rem; font-size: 13px; text-align: center; color: #111827; }
+  .owns-row { display: flex; gap: 12px; }
+  .owns-col { flex: 1; }
+  .owns-col h4 { font-size: 13px; font-weight: 600; margin-bottom: 8px; padding: 5px 10px; border-radius: 8px; }
+  .be-header { background: #EEEDFE; color: #3C3489; }
+  .fe-header { background: #E1F5EE; color: #085041; }
+  .owns-item { font-size: 12px; color: #6b7280; padding: 5px 0; border-bottom: 1px solid #f3f4f6; line-height: 1.5; }
+  .owns-item:last-child { border-bottom: none; }
+  .qtype-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .qtype-card { background: #f9fafb; border-radius: 8px; padding: 0.6rem 0.8rem; border: 1px solid #e5e7eb; }
+  .qtype-name { font-size: 12px; font-weight: 600; color: #111827; font-family: monospace; margin-bottom: 3px; }
+  .qtype-desc { font-size: 11px; color: #6b7280; line-height: 1.4; }
+  .qtype-ui { font-size: 11px; color: #534AB7; margin-top: 3px; font-weight: 500; }
+  .warn-box { background: #FAEEDA; border-left: 3px solid #BA7517; border-radius: 0 8px 8px 0; padding: 0.6rem 0.9rem; font-size: 13px; color: #633806; margin-top: 0.75rem; }
+  .info-box { background: #EEEDFE; border-left: 3px solid #534AB7; border-radius: 0 8px 8px 0; padding: 0.6rem 0.9rem; font-size: 13px; color: #3C3489; margin-top: 0.75rem; }
+  .slide-counter { font-size: 12px; color: #9ca3af; }
+  .col-header { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; margin-bottom: 8px; }
+  code { font-family: monospace; font-size: 11px; background: #f3f4f6; padding: 1px 5px; border-radius: 4px; color: #374151; }
+</style>
+</head>
+<body>
+<div class="deck">
+  <div class="nav-bar">
+    <div class="nav-dots" id="dots"></div>
+    <span class="slide-counter" id="counter">1 / 12</span>
+    <div class="nav-btns">
+      <button onclick="go(-1)">← Prev</button>
+      <button onclick="go(1)">Next →</button>
+    </div>
+  </div>
+
+  <!-- S1 -->
+  <div class="slide active" id="s1">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:0.5rem;">
+      <div class="slide-label">Frontend Engineer Onboarding</div>
+      <div style="font-size:36px;font-weight:700;color:#111827;line-height:1.2;">PowerDonor.AI<br>System Overview</div>
+      <div style="font-size:15px;color:#6b7280;margin-top:0.5rem;">A walkthrough of the architecture, APIs, interview flow, and current system state.</div>
+      <div style="margin-top:2rem;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="tag tag-purple">FastAPI backend</span>
+        <span class="tag tag-teal">React / TypeScript / Vite</span>
+        <span class="tag tag-blue">PostgreSQL on Railway</span>
+        <span class="tag tag-amber">ElevenLabs TTS</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="slide" id="s2">
+    <div class="slide-label">Context</div>
+    <div class="slide-title">What is PowerDonor?</div>
+    <div class="slide-sub">The problem we're solving and why this platform exists.</div>
+    <div class="grid2" style="gap:16px;">
+      <div class="card">
+        <div class="col-header" style="margin-bottom:10px;">The problem</div>
+        <div style="font-size:14px;color:#6b7280;line-height:1.7;">Hundreds of billions of dollars sit in Donor Advised Funds — money already committed to charity but never deployed. Donors don't know where to give. The process feels overwhelming.</div>
+      </div>
+      <div class="card">
+        <div class="col-header" style="margin-bottom:10px;">The solution</div>
+        <div style="font-size:14px;color:#6b7280;line-height:1.7;">PowerDonor interviews donors to understand their values and interests, then matches them to charities from a database of 1.9M nonprofits. Dafney is our AI interviewer.</div>
+      </div>
+    </div>
+    <div class="info-box" style="margin-top:1rem;">The frontend is the donor's entire experience — from the welcome screen through the interview to seeing their matched charities.</div>
+  </div>
+
+  <!-- S3 -->
+  <div class="slide" id="s3">
+    <div class="slide-label">Data context</div>
+    <div class="slide-title">What's in the database</div>
+    <div class="slide-sub">Context on what the backend is working with.</div>
+    <div class="grid3" style="margin-bottom:1rem;">
+      <div class="card" style="text-align:center;padding:1.25rem;">
+        <div class="stat-num">1.92M</div>
+        <div class="stat-lbl">IRS-registered charities</div>
+      </div>
+      <div class="card" style="text-align:center;padding:1.25rem;">
+        <div class="stat-num">252k</div>
+        <div class="stat-lbl">Enriched with AI data</div>
+      </div>
+      <div class="card" style="text-align:center;padding:1.25rem;">
+        <div class="stat-num">2M+</div>
+        <div class="stat-lbl">IRS 990 tax records</div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card-sm">
+        <div class="col-header">mvp_charities</div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.8;">EIN · Name · City · State · Website · Mission · Keywords · Subcategories · Geographic scope · Populations served · Volunteer opportunities · Events · 11 category boolean flags</div>
+      </div>
+      <div class="card-sm">
+        <div class="col-header">donors</div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.8;">Session ID · First name · Email · Completion status · Profile data — interview answers, per-category preferences, PPS output, and internal state</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S4 -->
+  <div class="slide" id="s4">
+    <div class="slide-label">Tech stack</div>
+    <div class="slide-title">What we're working with</div>
+    <div class="slide-sub">Current stack — open to discussion on frontend tooling choices.</div>
+    <div class="grid2" style="gap:16px;">
+      <div>
+        <div class="col-header">Frontend</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="card-sm" style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;">React + TypeScript</span><span class="tag tag-teal">UI framework</span></div>
+          <div class="card-sm" style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;">Vite</span><span class="tag tag-teal">Build tool</span></div>
+          <div class="card-sm" style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;">Browser Web Speech API</span><span class="tag tag-gray">TTS playback</span></div>
+          <div class="card-sm" style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;">localStorage</span><span class="tag tag-gray">Session storage</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="col-header">Backend</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="card-sm" style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;">FastAPI (Python)</span><span class="tag tag-purple">Backend</span></div>
+          <div class="card-sm" style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;">PostgreSQL on Railway</span><span class="tag tag-purple">Database</span></div>
+          <div class="card-sm" style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;">Claude API (Anthropic)</span><span class="tag tag-purple">AI / interview</span></div>
+          <div class="card-sm" style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;">ElevenLabs (Dafney voice)</span><span class="tag tag-purple">TTS generation</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="warn-box">API keys are never exposed to the client. All third-party calls go through the backend. The frontend only talks to <code>/api/*</code> endpoints.</div>
+  </div>
+
+  <!-- S5 -->
+  <div class="slide" id="s5">
+    <div class="slide-label">Architecture</div>
+    <div class="slide-title">How the system connects</div>
+    <div class="slide-sub">Overview of how the frontend, backend, and database relate.</div>
+    <div style="display:flex;align-items:center;gap:8px;margin:1rem 0 1.5rem;">
+      <div class="flow-box" style="flex:1;">Browser<br><span style="font-size:11px;color:#6b7280;">React / TS / Vite</span></div>
+      <div class="arrow">→</div>
+      <div class="flow-box" style="flex:1;background:#EEEDFE;border-color:#c4b5fd;">FastAPI Backend<br><span style="font-size:11px;color:#534AB7;">Railway — pd-backend</span></div>
+      <div class="arrow">→</div>
+      <div class="flow-box" style="flex:1;">PostgreSQL<br><span style="font-size:11px;color:#6b7280;">Railway — Postgres</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:1.5rem;">
+      <div style="flex:1;"></div>
+      <div class="arrow" style="opacity:0;">→</div>
+      <div class="flow-box" style="flex:1;background:#EEEDFE;border-color:#c4b5fd;display:flex;flex-direction:column;gap:4px;">
+        <span style="font-size:11px;color:#534AB7;">also calls →</span>
+        <span style="font-size:12px;">Claude API · ElevenLabs · Google Gemini</span>
+      </div>
+      <div class="arrow" style="opacity:0;">→</div>
+      <div style="flex:1;"></div>
+    </div>
+    <div class="grid2">
+      <div class="card-sm">
+        <div class="col-header">Security model</div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.7;">All API keys live as Railway environment variables on the backend. The frontend receives only data — never credentials. Rate limiting is enforced server-side.</div>
+      </div>
+      <div class="card-sm">
+        <div class="col-header">Development</div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.7;">Backend at <code>localhost:8000</code> · Frontend at <code>localhost:5173</code> · Swagger docs at <code>localhost:8000/docs</code> (disabled in production)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S6 -->
+  <div class="slide" id="s6">
+    <div class="slide-label">Interview flow</div>
+    <div class="slide-title">Responsibility split — backend and frontend</div>
+    <div class="slide-sub">How state and logic are divided between the two layers.</div>
+    <div class="owns-row">
+      <div class="owns-col">
+        <h4 class="be-header">Backend owns</h4>
+        <div class="owns-item">Flow order — what question comes next</div>
+        <div class="owns-item">Loop logic — which categories still need Q4a / Q4b</div>
+        <div class="owns-item">Skip rules — Q4b groups hidden for Environment</div>
+        <div class="owns-item">Validation — Q3 must be answered before Q4a</div>
+        <div class="owns-item">Question content — reads from question_bank.json</div>
+        <div class="owns-item">Answer storage — saves to donors.profile_data</div>
+      </div>
+      <div class="owns-col">
+        <h4 class="fe-header">Frontend owns</h4>
+        <div class="owns-item">Rendering the question (layout, animation, UI components)</div>
+        <div class="owns-item">Input handling (checkboxes, text fields, sliders)</div>
+        <div class="owns-item">TTS playback — calls /api/tts with tts_prompt received</div>
+        <div class="owns-item">Progress indicator ("Step 3 of 11")</div>
+        <div class="owns-item">Loading states between questions</div>
+        <div class="owns-item">localStorage for session_id persistence</div>
+      </div>
+    </div>
+    <div class="info-box">Any changes to flow logic, validation rules, or question content should go through the backend — happy to discuss and iterate on any of these together.</div>
+  </div>
+
+  <!-- S7 -->
+  <div class="slide" id="s7">
+    <div class="slide-label">Question types</div>
+    <div class="slide-title">Six input types — each needs its own UI component</div>
+    <div class="slide-sub">The <code>input_type</code> field in each question object tells you what to render.</div>
+    <div class="qtype-row">
+      <div class="qtype-card">
+        <div class="qtype-name">free_text</div>
+        <div class="qtype-desc">Open textarea, optional. Used for Q1 initial preferences.</div>
+        <div class="qtype-ui">→ Textarea + skip button</div>
+      </div>
+      <div class="qtype-card">
+        <div class="qtype-name">multi_select</div>
+        <div class="qtype-desc">Choose up to N options. Some have a free-text "other" option.</div>
+        <div class="qtype-ui">→ Checkbox grid + optional text input</div>
+      </div>
+      <div class="qtype-card">
+        <div class="qtype-name">multi_select_with_text</div>
+        <div class="qtype-desc">Some options trigger a text field (e.g. "City" → "Which city?").</div>
+        <div class="qtype-ui">→ Checkboxes + conditional text inputs</div>
+      </div>
+      <div class="qtype-card">
+        <div class="qtype-name">multi_select_grouped</div>
+        <div class="qtype-desc">Options organized into collapsible groups (age, race, etc.).</div>
+        <div class="qtype-ui">→ Grouped checkboxes with headers</div>
+      </div>
+      <div class="qtype-card">
+        <div class="qtype-name">single_select_with_numeric</div>
+        <div class="qtype-desc">One option triggers a numeric input (exact dollar amount).</div>
+        <div class="qtype-ui">→ Radio buttons + conditional number input</div>
+      </div>
+      <div class="qtype-card">
+        <div class="qtype-name">pps_generation</div>
+        <div class="qtype-desc">Special: shows generated PPS text, donor edits, then saves.</div>
+        <div class="qtype-ui">→ Editable textarea + save button</div>
+      </div>
+    </div>
+    <div class="info-box">Read <code>question_bank.json</code> before building any component — it shows exact field names, option shapes, and skip labels for every question.</div>
+  </div>
+
+  <!-- S8 -->
+  <div class="slide" id="s8">
+    <div class="slide-label">Interview flow — detail</div>
+    <div class="slide-title">Q4a, Q4b, Q4c repeat for each cause selected</div>
+    <div class="slide-sub">If the donor picks 3 cause categories in Q3, the next block runs 3 times — once per cause.</div>
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="col-header" style="margin-bottom:10px;">Example — donor selects Education, Health, Environment</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;"><span class="tag tag-purple" style="min-width:64px;text-align:center;">Q3</span><span style="font-size:13px;color:#6b7280;">Donor selects Education, Health, Environment</span></div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="tag tag-teal" style="min-width:64px;text-align:center;">Q4a×3</span><span style="font-size:13px;color:#6b7280;">Geography for Education → Geography for Health → Geography for Environment</span></div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="tag tag-teal" style="min-width:64px;text-align:center;">Q4b×3</span><span style="font-size:13px;color:#6b7280;">Population for Education → Population for Health → (filtered) for Environment</span></div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="tag tag-teal" style="min-width:64px;text-align:center;">Q4c×3</span><span style="font-size:13px;color:#6b7280;">Subcategory for Education → for Health → for Environment</span></div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="tag tag-gray" style="min-width:64px;text-align:center;">Q5→Q10</span><span style="font-size:13px;color:#6b7280;">Engagement, budget, PPS, results count, next steps</span></div>
+      </div>
+    </div>
+    <div class="warn-box">For Environment, Q4b filters out age, family, occupation, and identity groups — only community type (Rural/Tribal/Urban) shows. The backend sends the filtered options — the frontend renders what it receives.</div>
+  </div>
+
+  <!-- S9 -->
+  <div class="slide" id="s9">
+    <div class="slide-label">API reference</div>
+    <div class="slide-title">All endpoints + TTS + PPS rules</div>
+    <div class="slide-sub">Everything under <code>/api/</code> — rate limits enforced server-side.</div>
+    <div class="grid2" style="gap:12px;align-items:start;">
+      <div>
+        <div class="card-sm" style="margin-bottom:8px;">
+          <div class="col-header">Interview</div>
+          <div class="ep-row"><span class="method-post">POST</span><div><div class="endpoint">/api/interview/start</div><div class="endpoint-desc">Returns session_id + first question</div></div></div>
+          <div class="ep-row"><span class="method-post">POST</span><div><div class="endpoint">/api/interview/answer</div><div class="endpoint-desc">Send session_id + question_id + answer → next question or complete:true</div></div></div>
+          <div class="ep-row"><span class="method-get">GET</span><div><div class="endpoint">/api/interview/session/{id}</div><div class="endpoint-desc">Full donor session</div></div></div>
+          <div class="ep-row"><span class="method-get">GET</span><div><div class="endpoint">/api/interview/question/{id}</div><div class="endpoint-desc">Fetch single question by ID</div></div></div>
+        </div>
+        <div class="card-sm">
+          <div class="col-header">Matching — in progress</div>
+          <div class="ep-row"><span class="method-post">POST</span><div><div class="endpoint">/api/matching/find</div><div class="endpoint-desc">Find charity matches — vector search being built</div></div></div>
+          <div class="ep-row"><span class="method-get">GET</span><div><div class="endpoint">/api/matching/results/{id}</div><div class="endpoint-desc">Get previously computed results</div></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="card-sm" style="margin-bottom:8px;">
+          <div class="col-header">TTS — rate limit: 20/min</div>
+          <div class="ep-row"><span class="method-post">POST</span><div><div class="endpoint">/api/tts</div><div class="endpoint-desc">Send text → get MP3 stream. Fire on each new question using tts_prompt field.</div></div></div>
+        </div>
+        <div class="card-sm">
+          <div class="col-header">PPS — rate limit: 5/min</div>
+          <div class="ep-row"><span class="method-post">POST</span><div><div class="endpoint">/api/pps/generate</div><div class="endpoint-desc">Fire silently after Q8 regardless of donor choice.</div></div></div>
+          <div class="ep-row"><span class="method-post">POST</span><div><div class="endpoint">/api/pps/save</div><div class="endpoint-desc">After donor edits, save the final version.</div></div></div>
+          <div class="ep-row"><span class="method-get">GET</span><div><div class="endpoint">/api/pps/{session_id}</div><div class="endpoint-desc">Retrieve PPS for a session</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S10 -->
+  <div class="slide" id="s10">
+    <div class="slide-label">Session handling</div>
+    <div class="slide-title">How sessions work</div>
+    <div class="slide-sub">Simple conventions to keep client and backend in sync.</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:1rem;">
+      <div class="card-sm" style="display:flex;gap:12px;align-items:flex-start;"><span class="tag tag-purple" style="margin-top:2px;white-space:nowrap;">session_id</span><span style="font-size:13px;color:#6b7280;">A UUID returned by <code>/api/interview/start</code>. Store it in localStorage immediately. It identifies the donor for the entire session.</span></div>
+      <div class="card-sm" style="display:flex;gap:12px;align-items:flex-start;"><span class="tag tag-teal" style="margin-top:2px;white-space:nowrap;">Every request</span><span style="font-size:13px;color:#6b7280;">Pass session_id in the request body — not as a header, not as a cookie. Every POST to /api/interview/answer, /api/pps/*, and /api/matching/* must include it.</span></div>
+      <div class="card-sm" style="display:flex;gap:12px;align-items:flex-start;"><span class="tag tag-amber" style="margin-top:2px;white-space:nowrap;">On reload</span><span style="font-size:13px;color:#6b7280;">Read session_id from localStorage. If present, call <code>GET /api/interview/session/{id}</code> to restore state. If absent, start fresh.</span></div>
+      <div class="card-sm" style="display:flex;gap:12px;align-items:flex-start;"><span class="tag tag-gray" style="margin-top:2px;white-space:nowrap;">No accounts</span><span style="font-size:13px;color:#6b7280;">MVP has no login, no auth, no passwords. The session_id is the only identity. Clear it to start a new interview.</span></div>
+    </div>
+    <div class="info-box">UUID pattern validation is enforced on the backend. Always use the UUID from /api/interview/start.</div>
+  </div>
+
+  <!-- S11 -->
+  <div class="slide" id="s11">
+    <div class="slide-label">Current status</div>
+    <div class="slide-title">What's in progress</div>
+    <div class="slide-sub">One area still being built — good to be aware of before diving in.</div>
+    <div class="card" style="margin-bottom:1rem;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span class="tag tag-blue">In progress</span><span style="font-size:14px;font-weight:600;">Matching results UI</span></div>
+      <div style="font-size:13px;color:#6b7280;line-height:1.7;">The matching engine is being rebuilt with vector search — embeddings aren't computed yet so the endpoint exists but isn't returning real results. The results page has no fixed spec yet — would love your input on how to present matches to donors once the engine is ready.</div>
+    </div>
+    <div class="info-box">If Q10 answer is "search_now" — fire /api/matching/find and show a loading state. Happy to discuss how you'd like to handle the results page in the meantime.</div>
+  </div>
+
+  <!-- S12 -->
+  <div class="slide" id="s12">
+    <div class="slide-label">Getting started</div>
+    <div class="slide-title">Day one</div>
+    <div class="slide-sub">Everything needed to run locally and explore the API.</div>
+    <div class="grid2" style="gap:12px;">
+      <div class="card-sm">
+        <div class="col-header">.env setup</div>
+        <div style="font-family:monospace;font-size:11px;color:#6b7280;line-height:2.2;">VITE_BACKEND_URL=http://localhost:8000<br>DATABASE_URL=... (backend only)<br>ANTHROPIC_API_KEY=... (backend only)</div>
+        <div style="font-size:11px;color:#633806;margin-top:8px;">Backend keys should never be prefixed with VITE_ — they would be exposed in the browser bundle.</div>
+      </div>
+      <div class="card-sm">
+        <div class="col-header">Run locally</div>
+        <div style="font-family:monospace;font-size:11px;color:#6b7280;line-height:2.2;">cd frontend<br>npm install<br>npm run dev<br><br>cd backend && python main.py</div>
+      </div>
+      <div class="card-sm">
+        <div class="col-header">Suggested starting points</div>
+        <div style="font-size:12px;color:#6b7280;line-height:1.9;">1. Read question_bank.json end to end<br>2. Open Swagger at localhost:8000/docs<br>3. Run /api/interview/start in Swagger<br>4. Walk through the full flow manually<br>5. Then start building components</div>
+      </div>
+      <div class="card-sm">
+        <div class="col-header">Key files</div>
+        <div style="font-size:12px;color:#6b7280;line-height:2;font-family:monospace;">question_bank.json<br>routes_interview.py<br>routes_pps.py<br>routes_tts.py<br>config.py</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const total = 12;
+  let cur = 1;
+  const dotsEl = document.getElementById('dots');
+  for(let i=1;i<=total;i++){
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===1?' active':'');
+    d.onclick = () => showSlide(i);
+    dotsEl.appendChild(d);
+  }
+  function showSlide(n){
+    document.getElementById('s'+cur).classList.remove('active');
+    document.querySelectorAll('.dot')[cur-1].classList.remove('active');
+    cur = Math.max(1,Math.min(total,n));
+    document.getElementById('s'+cur).classList.add('active');
+    document.querySelectorAll('.dot')[cur-1].classList.add('active');
+    document.getElementById('counter').textContent = cur + ' / ' + total;
+  }
+  function go(d){ showSlide(cur+d); }
+  document.addEventListener('keydown', e => {
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') go(1);
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp') go(-1);
+  });
+</script>
+</body>
+</html>
